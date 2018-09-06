@@ -1,46 +1,62 @@
 #ifndef PID_H
 #define PID_H
 
+enum coefficient_type {
+    P,
+    I,
+    D
+};
+
+
 class PID {
 public:
-  /*
-  * Errors
-  */
-  double p_error;
-  double i_error;
-  double d_error;
 
-  /*
-  * Coefficients
-  */ 
-  double Kp;
-  double Ki;
-  double Kd;
+    // twiddle
+    bool useTwiddle;
+    double tolerance;
+    double prev_cte;
 
-  /*
-  * Constructor
-  */
-  PID();
+    static constexpr int N = 3;
+    int current_param;  // the current parameter which is being tweedled
+    double best_error;
+    double total_error;
+    bool run_robot_again;
 
-  /*
-  * Destructor.
-  */
-  virtual ~PID();
+    double p[N];            // coefficients
+    double dp[N];           //
+    double errors[N];   // errors
 
-  /*
-  * Initialize PID.
-  */
-  void Init(double Kp, double Ki, double Kd);
+    /*
+    * Constructor
+    */
+    PID();
 
-  /*
-  * Update the PID error variables given cross track error.
-  */
-  void UpdateError(double cte);
+    /*
+    * Destructor.
+    */
+    virtual ~PID();
 
-  /*
-  * Calculate the total PID error.
-  */
-  double TotalError();
+    /*
+    * Initialize PID.
+    */
+    void Init(double Kp, double Ki, double Kd, bool useTwiddle);
+
+    /*
+    * Update the PID error variables given cross track error.
+    */
+    void UpdateError(double cte);
+
+    /*
+    * Calculate the total PID error.
+    */
+    double TotalError();
+
+    /*
+     * Use this to optimise coefficients of the PID
+     * */
+    void TwiddleCoefficients();
+
+    double UsableOutput();
 };
 
 #endif /* PID_H */
